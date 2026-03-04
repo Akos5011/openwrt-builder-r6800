@@ -1,0 +1,57 @@
+name: Build OpenWrt for Netgear R6800
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout custom files
+        uses: actions/checkout@v4
+        with:
+          path: custom
+
+      - name: Checkout OpenWrt source
+        uses: actions/checkout@v4
+        with:
+          repository: openwrt/openwrt
+          path: openwrt
+
+      - name: Apply antenna fix patch
+        working-directory: openwrt
+        run: |
+          patch -p1 < ../custom/patches/001-antenna-count-fix.patch
+
+      - name: Copy custom files overlay
+        working-directory: openwrt
+        run: cp -r ../custom/files .
+
+      - name: Copy config seed
+        working-directory: openwrt
+        run: cp ../custom/config.seed .config
+
+      - name: Update feeds
+        working-directory: openwrt
+        run: |
+          ./scripts/feeds update -a
+          ./scripts/feeds install -a
+
+      - name: Expand configuration
+        working-directory: openwrt
+        run: make defconfig
+
+      - name: Build firmware
+        working-directory: openwrt
+        run: |
+          make -j$(nproc) V=s
+
+      - name: Upload firmware artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: openwrt-r6800-firmware
+          path: openwrt/bin/targets/ramips/mt7621/
+          if-no-files-found: error
