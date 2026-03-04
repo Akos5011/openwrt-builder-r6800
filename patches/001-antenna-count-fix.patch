@@ -1,0 +1,22 @@
+--- a/target/linux/ramips/dts/mt7621_netgear_r6800.dts
++++ b/target/linux/ramips/dts/mt7621_netgear_r6800.dts
+@@ -122,12 +122,14 @@
+ &pcie0 {
+ 	wifi@0,0 {
+ 		compatible = "mediatek,mt76";
+ 		reg = <0x0000 0 0 0 0>;
+ 		mediatek,mtd-eeprom = <&factory 0x0000>;
+ 		ieee80211-freq-limit = <2400000 2500000>;
++		mediatek,antenna-count = <3>;
+ 	};
+ };
+
+ &pcie1 {
+ 	wifi@0,0 {
+ 		compatible = "mediatek,mt76";
+ 		reg = <0x0000 0 0 0 0>;
+ 		mediatek,mtd-eeprom = <&factory 0x8000>;
+ 		ieee80211-freq-limit = <5000000 6000000>;
++		mediatek,antenna-count = <3>;
+ 	};
+ };
